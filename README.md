@@ -27,8 +27,8 @@ Ollama must be running before you start the agent. By default it listens on `htt
 ### 2. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd <repo-folder>
+git clone https://github.com/HIManish-G/Prodigal-AI_Assignment.git
+cd Prodigal-AI_Assignment
 ```
 
 ### 3. Install Python dependencies

@@ -17,6 +17,9 @@ develop-eggs/
 lib/
 lib64/
 wheels/
+testing/
+testing_code/
+old/
 
 # ── Virtual Environments ──────────────────────────────────────────────────────
 .venv/
