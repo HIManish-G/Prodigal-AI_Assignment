@@ -235,8 +235,14 @@ python cli.py --confirm=true
 
 Enable via environment variable (for the API server):
 
+for linus
 ```bash
 REQUIRE_PAYMENT_CONFIRMATION=true uvicorn api:app --host 0.0.0.0 --port 8000
+```
+
+for windows
+```bash
+set REQUIRE_PAYMENT_CONFIRMATION=true&& uvicorn api:app --host 0.0.0.0 --port 8000
 ```
 
 The `/health` endpoint exposes the current value of this flag so API callers can always inspect the server's confirmation mode.
