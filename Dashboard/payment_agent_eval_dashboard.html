@@ -1,0 +1,302 @@
+
+<style>
+h2.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.dash{padding:1.5rem 0}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem 1.25rem}
+.stat-label{font-size:12px;color:var(--color-text-secondary);margin:0 0 4px}
+.stat-val{font-size:26px;font-weight:500;margin:0;color:var(--color-text-primary)}
+.stat-sub{font-size:11px;color:var(--color-text-tertiary);margin:4px 0 0}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.chart-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem}
+.chart-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin:0 0 1rem;text-transform:uppercase;letter-spacing:.04em}
+.chart-wrap{position:relative;width:100%}
+.full-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:20px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:12px;color:var(--color-text-secondary)}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.tag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.tag-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0}
+.tag-name{color:var(--color-text-secondary);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag-bar-bg{flex:2;height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden}
+.tag-bar{height:100%;border-radius:3px;background:#1D9E75}
+.tag-pct{font-size:11px;color:var(--color-text-tertiary);min-width:28px;text-align:right}
+.conv-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:6px}
+.conv-bar{display:flex;flex-direction:column;align-items:center;gap:6px}
+.conv-bar-inner{width:32px;background:var(--color-background-secondary);border-radius:3px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.conv-fill{width:100%;border-radius:3px 3px 0 0}
+.conv-label{font-size:10px;color:var(--color-text-secondary);text-align:center;line-height:1.3}
+.conv-val{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+</style>
+
+<h2 class="sr-only">Payment Collection Agent — evaluation dashboard showing 16/16 test passes, 13/13 adversarial defenses, and 8.0/10 LLM judge average across all test categories.</h2>
+
+<div class="dash">
+
+<div class="stat-grid">
+  <div class="stat">
+    <p class="stat-label">Standard tests</p>
+    <p class="stat-val">16 / 16</p>
+    <p class="stat-sub">100% pass rate</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Adversarial tests</p>
+    <p class="stat-val">13 / 13</p>
+    <p class="stat-sub">0 vulnerabilities exposed</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">LLM judge average</p>
+    <p class="stat-val">8.0 / 10</p>
+    <p class="stat-sub">Over 16 conversations</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Tag categories</p>
+    <p class="stat-val">18 / 18</p>
+    <p class="stat-sub">All at 100%</p>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <div class="chart-card">
+    <p class="chart-title">LLM judge score by test case</p>
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Happy path</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>Verification</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#D85A30"></span>Payment failure</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#7F77DD"></span>Edge case</span>
+    </div>
+    <div class="chart-wrap" style="height:260px"><canvas id="scoreChart" role="img" aria-label="Horizontal bar chart of LLM judge scores per test case, ranging from 6 to 9 out of 10">Scores range from 6.0 (payment_invalid_card_number) to 9.0 (zero_balance_account), with most cases scoring 8.0.</canvas></div>
+  </div>
+  <div class="chart-card">
+    <p class="chart-title">Test duration by category (ms)</p>
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Happy path</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>Verification</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#D85A30"></span>Payment failure</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#7F77DD"></span>Edge case</span>
+    </div>
+    <div class="chart-wrap" style="height:260px"><canvas id="timeChart" role="img" aria-label="Bar chart showing test duration in milliseconds by test case">Zero-balance and invalid-account cases complete fastest (under 15s) while expired-card recovery takes longest at 53 seconds.</canvas></div>
+  </div>
+</div>
+
+<div class="full-card">
+  <p class="chart-title">Pass rate by tag category (all 100%)</p>
+  <div class="tag-grid">
+    <div>
+      <div class="tag-row"><span class="tag-name">happy_path</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">5/5</span></div>
+      <div class="tag-row"><span class="tag-name">verification_failure</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">3/3</span></div>
+      <div class="tag-row"><span class="tag-name">payment_failure</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">3/3</span></div>
+      <div class="tag-row"><span class="tag-name">edge_case</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">5/5</span></div>
+      <div class="tag-row"><span class="tag-name">lockout</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+      <div class="tag-row"><span class="tag-name">retry_success</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+    </div>
+    <div>
+      <div class="tag-row"><span class="tag-name">case_sensitive</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+      <div class="tag-row"><span class="tag-name">leap_year</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+      <div class="tag-row"><span class="tag-name">zero_balance</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+      <div class="tag-row"><span class="tag-name">invalid_account</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+      <div class="tag-row"><span class="tag-name">invalid_card</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+      <div class="tag-row"><span class="tag-name">excess_amount</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+    </div>
+    <div>
+      <div class="tag-row"><span class="tag-name">expired_card</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+      <div class="tag-row"><span class="tag-name">long_name</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">2/2</span></div>
+      <div class="tag-row"><span class="tag-name">messy_input</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">2/2</span></div>
+      <div class="tag-row"><span class="tag-name">out_of_order</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+      <div class="tag-row"><span class="tag-name">partial_payment</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+      <div class="tag-row"><span class="tag-name">nickname</span><div class="tag-bar-bg"><div class="tag-bar" style="width:100%"></div></div><span class="tag-pct">1/1</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <div class="chart-card">
+    <p class="chart-title">Conversation turn count (sample conversations)</p>
+    <div class="chart-wrap" style="height:220px">
+      <div class="conv-grid" style="height:200px;align-items:flex-end">
+        <div class="conv-bar">
+          <span class="conv-val">8</span>
+          <div class="conv-bar-inner" style="height:160px"><div class="conv-fill" style="height:100%;background:#1D9E75"></div></div>
+          <span class="conv-label">Happy path full</span>
+        </div>
+        <div class="conv-bar">
+          <span class="conv-val">6</span>
+          <div class="conv-bar-inner" style="height:160px"><div class="conv-fill" style="height:75%;background:#1D9E75"></div></div>
+          <span class="conv-label">Happy path messy</span>
+        </div>
+        <div class="conv-bar">
+          <span class="conv-val">8</span>
+          <div class="conv-bar-inner" style="height:160px"><div class="conv-fill" style="height:100%;background:#378ADD"></div></div>
+          <span class="conv-label">Verify lockout</span>
+        </div>
+        <div class="conv-bar">
+          <span class="conv-val">9</span>
+          <div class="conv-bar-inner" style="height:160px"><div class="conv-fill" style="height:100%;background:#D85A30"></div></div>
+          <span class="conv-label">Card recovery</span>
+        </div>
+        <div class="conv-bar">
+          <span class="conv-val">2</span>
+          <div class="conv-bar-inner" style="height:160px"><div class="conv-fill" style="height:25%;background:#7F77DD"></div></div>
+          <span class="conv-label">Zero balance</span>
+        </div>
+        <div class="conv-bar">
+          <span class="conv-val">8</span>
+          <div class="conv-bar-inner" style="height:160px"><div class="conv-fill" style="height:100%;background:#BA7517"></div></div>
+          <span class="conv-label">Adversarial amt</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <p class="chart-title">Adversarial attack defense breakdown</p>
+    <div class="chart-wrap" style="height:220px"><canvas id="advChart" role="img" aria-label="Donut chart showing 13 adversarial test cases all defended successfully">All 13 adversarial test cases were defended: 3 original cases and 10 advanced cases.</canvas></div>
+  </div>
+</div>
+
+<div class="full-card">
+  <p class="chart-title">Avg LLM HTTP calls per turn (estimated from log timestamps)</p>
+  <div class="chart-wrap" style="height:180px"><canvas id="callsChart" role="img" aria-label="Bar chart showing average LLM HTTP calls per turn by stage">Extraction-heavy stages like AWAIT_SECONDARY and AWAIT_CARD make the most LLM calls per turn.</canvas></div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const textColor = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)';
+const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+
+const baseOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: { callbacks: {} } },
+  scales: {}
+};
+
+const scoreLabels = [
+  'happy: full amount + DOB','happy: partial + Aadhaar','happy: messy inputs',
+  'happy: all-in-one card','happy: name upfront',
+  'verify: wrong secondary → correct','verify: case-sensitive name','verify: wrong name lockout',
+  'payment: invalid card','payment: exceed balance','payment: expired card',
+  'edge: zero balance','edge: leap year DOB','edge: invalid account','edge: spaced ID','edge: long name'
+];
+const scoreData = [8,8,8,8,8, 8,8,8, 6,8,8, 9,8,8,8,8];
+const scoreColors = [
+  '#1D9E75','#1D9E75','#1D9E75','#1D9E75','#1D9E75',
+  '#378ADD','#378ADD','#378ADD',
+  '#D85A30','#D85A30','#D85A30',
+  '#7F77DD','#7F77DD','#7F77DD','#7F77DD','#7F77DD'
+];
+
+new Chart(document.getElementById('scoreChart'), {
+  type: 'bar',
+  data: {
+    labels: scoreLabels,
+    datasets: [{
+      data: scoreData,
+      backgroundColor: scoreColors,
+      borderRadius: 3,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => ` ${ctx.raw}/10` }
+    }},
+    scales: {
+      x: { min: 0, max: 10, ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor }, border: { display: false } },
+      y: { ticks: { color: textColor, font: { size: 9 } }, grid: { display: false }, border: { display: false } }
+    }
+  }
+});
+
+const timeLabels = [
+  'happy: full','happy: partial','happy: messy','happy: all-in-one','happy: upfront',
+  'verify: retry','verify: case','verify: lockout',
+  'payment: card','payment: exceed','payment: expired',
+  'edge: zero','edge: leap','edge: invalid ID','edge: spaced','edge: long name'
+];
+const timeData = [45000,35000,48000,32000,40000, 36516,36937,42000, 41811,32260,53164, 10960,31034,14098,28037,28754];
+const timeColors = [
+  '#1D9E75','#1D9E75','#1D9E75','#1D9E75','#1D9E75',
+  '#378ADD','#378ADD','#378ADD',
+  '#D85A30','#D85A30','#D85A30',
+  '#7F77DD','#7F77DD','#7F77DD','#7F77DD','#7F77DD'
+];
+
+new Chart(document.getElementById('timeChart'), {
+  type: 'bar',
+  data: {
+    labels: timeLabels,
+    datasets: [{
+      data: timeData.map(v => Math.round(v/1000)),
+      backgroundColor: timeColors,
+      borderRadius: 3,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => ` ${ctx.raw}s` }
+    }},
+    scales: {
+      x: { ticks: { color: textColor, font: { size: 10 }, callback: v => v+'s' }, grid: { color: gridColor }, border: { display: false } },
+      y: { ticks: { color: textColor, font: { size: 9 } }, grid: { display: false }, border: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('advChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Original 3 cases defended','Advanced 10 cases defended'],
+    datasets: [{
+      data: [3, 10],
+      backgroundColor: ['#1D9E75','#5DCAA5'],
+      borderWidth: 0,
+      hoverOffset: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: {
+      legend: { display: true, position: 'bottom', labels: { color: textColor, font: { size: 11 }, boxWidth: 10, padding: 12 } },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}/13` } }
+    }
+  }
+});
+
+new Chart(document.getElementById('callsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['INIT','AWAIT_ACCOUNT_ID','AWAIT_NAME','AWAIT_SECONDARY','AWAIT_AMOUNT','AWAIT_CARD','CONFIRM_PAYMENT','DONE'],
+    datasets: [{
+      label: 'Avg LLM calls',
+      data: [1, 4, 3, 5, 3, 5, 2, 1],
+      backgroundColor: ['#7F77DD','#7F77DD','#378ADD','#378ADD','#1D9E75','#D85A30','#BA7517','#888780'],
+      borderRadius: 4,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => ` ~${ctx.raw} LLM calls` }
+    }},
+    scales: {
+      x: { ticks: { color: textColor, font: { size: 11 } }, grid: { display: false }, border: { display: false } },
+      y: { min: 0, max: 7, ticks: { color: textColor, font: { size: 11 }, stepSize: 1 }, grid: { color: gridColor }, border: { display: false } }
+    }
+  }
+});
+</script>

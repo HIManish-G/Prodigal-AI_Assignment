@@ -49,14 +49,14 @@ class Agent:
     def next(self, user_input: str) -> dict:
         """Process one turn using your stable 16/16 baseline with secure Inverted Gateway routing."""
         user_input = (user_input or "").strip()
-        log.info("TURN  stage=%-20s input=%r", self.state.stage, user_input[:80])
+        log.info("TURN  stage=%-20s input=%r", self.state.stage, user_input)
 
         # 1. STARTUP BYPASS: If this is the very first turn (empty input), directly trigger the checklist greeting
         # (Saves 4-5 redundant LLM extraction calls on empty text!)
         if not user_input:
             response = self._run_checklist_flow(user_input)
             self.state.history.append({"role": "assistant", "content": response})
-            log.info("REPLY stage=%-20s reply=%r", self.state.stage, response[:80])
+            log.info("REPLY stage=%-20s reply=%r", self.state.stage, response)
             return {"message": response}
 
         # 2. THE CHITCHAT SWITCH: Route pure casual talk away from the state machine deterministically
@@ -81,6 +81,7 @@ class Agent:
         old_card_year = self.state.card.expiry_year
         old_card_cvv = self.state.card.cvv
         old_card_name = self.state.card.cardholder_name
+        old_stage = self.state.stage
 
         # 2. Run your original, stable 16/16 sweep checklist on the RAW user input (Zero-Risk!)
         self._sweep_checklist_inputs(user_input)
@@ -96,7 +97,8 @@ class Agent:
             (self.state.card.expiry_month != old_card_month) or
             (self.state.card.expiry_year != old_card_year) or
             (self.state.card.cvv != old_card_cvv) or
-            (self.state.card.cardholder_name != old_card_name)
+            (self.state.card.cardholder_name != old_card_name) or
+            (old_stage == Stage.CONFIRM_PAYMENT)
         )
 
         # 5. INVERTED GATEWAY SWITCH
@@ -124,7 +126,7 @@ class Agent:
         self.state.history.append({"role": "user", "content": sanitized_input})
         self.state.history.append({"role": "assistant", "content": response})
 
-        log.info("REPLY stage=%-20s reply=%r", self.state.stage, response[:80])
+        log.info("REPLY stage=%-20s reply=%r", self.state.stage, response)
         return {"message": response}
 
     def _sweep_checklist_inputs(self, text: str) -> None:
