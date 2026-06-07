@@ -7,7 +7,8 @@ Recommended for 4070 laptop (8 GB VRAM):
   - mistral-nemo  (~7.5 GB VRAM, bigger context, higher quality)
 """
 import os
-
+def get_require_confirmation() -> bool:
+    return os.getenv("REQUIRE_PAYMENT_CONFIRMATION", "false").lower() == "true"
 # ── LLM ──────────────────────────────────────────────────────────────────────
 OLLAMA_MODEL    = os.getenv("OLLAMA_MODEL",    "llama3.1:8b")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")

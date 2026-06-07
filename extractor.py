@@ -377,7 +377,6 @@ def extract_pincode(text: str) -> Optional[str]:
     raw = result.get("pincode")
     if raw:
         pincode = str(raw).strip()
-        # Python 1-to-1 exact substring check on raw user text
         if pincode in text:
             if re.match(r"^\d{6}$", pincode):
                 return pincode
@@ -696,3 +695,36 @@ def classify_intent(text: str, stage: str) -> bool:
     except Exception as exc:
         log.warning("Intent routing failed, defaulting to True: %s", exc)
         return True
+
+_CONFIRM_RE = re.compile(
+    r"\b(yes|yeah|yep|sure|confirm|proceed|ok|okay|correct|go ahead|do it|sounds good|please do|yup|absolutely)\b",
+    re.IGNORECASE
+)
+_DECLINE_RE = re.compile(
+    r"\b(no|nope|cancel|stop|wait|hold|don't|dont|change|wrong|incorrect|back)\b",
+    re.IGNORECASE
+)
+
+def extract_confirmation(text: str) -> Optional[bool]:
+    """Returns True for confirm, False for cancel, None if unclear."""
+    # Fast regex path
+    if _CONFIRM_RE.search(text):
+        return True
+    if _DECLINE_RE.search(text):
+        return False
+
+    # LLM fallback for anything ambiguous
+    result = _llm_json(
+        system_prompt=(
+            "The user was asked to confirm or cancel a payment. "
+            "Determine if their message means they want to confirm/proceed, "
+            "or cancel/change something. "
+            "Return ONLY a JSON object: {\"confirmation\": true/false/null}. "
+            "null means genuinely unclear."
+        ),
+        user_text=text,
+    )
+    val = result.get("confirmation")
+    if val is None:
+        return None
+    return bool(val)

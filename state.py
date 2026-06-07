@@ -18,6 +18,7 @@ class Stage(str, Enum):
     BALANCE_SHOWN     = "BALANCE_SHOWN"       # Balance shared; ask intent
     AWAIT_AMOUNT      = "AWAIT_AMOUNT"        # Collecting payment amount
     AWAIT_CARD        = "AWAIT_CARD"          # Progressive card collection
+    CONFIRM_PAYMENT = "CONFIRM_PAYMENT"       # confirm payment before processing
     # ── Terminal ─────────────────────────────────────────────────────────────
     DONE              = "DONE"                # Successful flow complete
     LOCKED_OUT        = "LOCKED_OUT"          # Too many verification failures

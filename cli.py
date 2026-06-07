@@ -60,10 +60,19 @@ def main() -> None:
         "--model", default=None,
         help="Override Ollama model (e.g. qwen2.5:7b). Default: llama3.1:8b"
     )
+    parser.add_argument(
+    "--confirm",
+    default=None,
+    choices=["true", "false"],
+    help="Require payment confirmation step before charging (default: true)"
+    )
     args = parser.parse_args()
 
     if args.model:
         os.environ["OLLAMA_MODEL"] = args.model
+    
+    if args.confirm is not None:
+        os.environ["REQUIRE_PAYMENT_CONFIRMATION"] = args.confirm
 
     run_interactive(debug=args.debug)
 

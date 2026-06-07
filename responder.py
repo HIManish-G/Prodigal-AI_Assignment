@@ -219,3 +219,18 @@ def generate_chitchat(history: List[Dict[str, str]], metadata_prompt: str) -> st
     except Exception as exc:
         log.warning("Chitchat responder error: %s", exc)
         return "Hello! I am here to assist with your payment. Let me know when you are ready to get started."
+
+def ask_confirmation(amount: float, card_last4: str) -> str:
+    formatted = f"{CURRENCY_SYMBOL}{amount:,.2f}"
+    return _ask(
+        f"Ask the user to confirm they want to proceed with a payment of {formatted} "
+        f"using the card ending in {card_last4}. Keep it brief.",
+        f"Just to confirm — you'd like to pay {formatted} using the card ending in {card_last4}. Shall I proceed?"
+    )
+
+def payment_cancelled() -> str:
+    return _ask(
+        "The user cancelled or wants to change something before payment. "
+        "Acknowledge warmly and ask what they'd like to change — the amount or card details.",
+        "No problem! What would you like to change — the amount or the card details?"
+    )

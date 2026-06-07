@@ -10,7 +10,7 @@ import logging
 import re
 from typing import Optional, Any
 
-from config import MAX_VERIFICATION_ATTEMPTS, MAX_CARD_ATTEMPTS, CURRENCY_SYMBOL
+from config import MAX_VERIFICATION_ATTEMPTS, MAX_CARD_ATTEMPTS, CURRENCY_SYMBOL, get_require_confirmation
 from state import ConversationState, Stage, CardDetails
 import extractor
 import responder
@@ -127,9 +127,6 @@ class Agent:
         log.info("REPLY stage=%-20s reply=%r", self.state.stage, response[:80])
         return {"message": response}
 
-
-    # ── Your Original 16/16 Checklist Operations ─────────────────────────────
-
     def _sweep_checklist_inputs(self, text: str) -> None:
         """Opportunistically scan incoming text to gather missing checklist details."""
         if not self.state.account_id:
@@ -181,7 +178,7 @@ class Agent:
             self._temp_extracted_amount = None
 
         if self.state.verified and (self.state.payment_amount is not None or self._temp_extracted_amount is not None):
-           if self.state.stage == Stage.AWAIT_CARD or self.state.payment_amount is not None:
+           if self.state.stage in (Stage.AWAIT_CARD, Stage.CONFIRM_PAYMENT) or self.state.payment_amount is not None:
                self.state.card = extractor.extract_card_details(text, existing=self.state.card)
 
     def _run_checklist_flow(self, text: str) -> str:
@@ -300,6 +297,29 @@ class Agent:
 
                 self.state.stage = Stage.AWAIT_CARD
                 return responder.card_validation_error(validation_error)
+
+            # ── Step 6: Confirm before charging ──
+            if get_require_confirmation():
+                if self.state.stage != Stage.CONFIRM_PAYMENT:
+                    self.state.stage = Stage.CONFIRM_PAYMENT
+                    return responder.ask_confirmation(
+                        self.state.payment_amount,
+                        self.state.card.number[-4:]
+                    )
+
+                confirmation = extractor.extract_confirmation(text)
+                if confirmation is True:
+                    return self._process_payment()
+                elif confirmation is False:
+                    self.state.card = CardDetails()
+                    self.state.payment_amount = None
+                    self.state.stage = Stage.AWAIT_AMOUNT
+                    return responder.payment_cancelled()
+                else:
+                    return responder.ask_confirmation(
+                        self.state.payment_amount,
+                        self.state.card.number[-4:]
+                    )
 
             return self._process_payment()
 
@@ -423,6 +443,8 @@ class Agent:
             next_needed = "payment amount they wish to pay"
         elif stage == Stage.AWAIT_CARD:
             next_needed = f"missing card details: {', '.join(missing_card)}"
+        elif stage == Stage.CONFIRM_PAYMENT:
+            next_needed = "confirmation to proceed with the payment (yes/no)"
             
         return (
             f"[SITUATIONAL CHECKLIST METADATA]:\n"
