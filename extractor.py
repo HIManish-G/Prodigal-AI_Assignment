@@ -464,6 +464,18 @@ def _luhn_check(number: str) -> bool:
         total += d
     return total % 10 == 0
 
+def has_failed_luhn_card_number(text: str) -> bool:
+    """Returns True if the text contains a 15-16 digit sequence that fails the Luhn check.
+    Used to give the user a specific 'invalid card number' error rather than silently re-asking.
+    """
+    match = re.search(r"\b(?:\d[ -]*?){15,16}\b", text)
+    if match:
+        clean_num = re.sub(r"\D", "", match.group(0))
+        if len(clean_num) in (15, 16) and not _luhn_check(clean_num):
+            return True
+    return False
+
+
 
 def extract_card_details(text: str, existing: Optional[CardDetails] = None) -> CardDetails:
     card = existing or CardDetails()
@@ -481,7 +493,7 @@ def extract_card_details(text: str, existing: Optional[CardDetails] = None) -> C
     num_match = re.search(r"\b(?:\d[ -]*?){15,16}\b", text)
     if num_match:
         clean_num = re.sub(r"\D", "", num_match.group(0))
-        if len(clean_num) in (15, 16):
+        if len(clean_num) in (15, 16) and _luhn_check(clean_num):
             card.number = clean_num
 
     # Expiry MM/YY or MM/YYYY
@@ -543,7 +555,7 @@ def extract_card_details(text: str, existing: Optional[CardDetails] = None) -> C
         num_str = str(result["card_number"]).strip()
         if re.sub(r"\D", "", num_str) in no_spaces_text:
             clean_num = re.sub(r"\D", "", num_str)
-            if len(clean_num) in (15, 16):
+            if len(clean_num) in (15, 16) and _luhn_check(clean_num):
                 card.number = clean_num
 
     if not card.expiry_month and result.get("expiry_month") is not None:

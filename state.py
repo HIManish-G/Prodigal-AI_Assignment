@@ -28,7 +28,7 @@ class Stage(str, Enum):
 @dataclass
 class CardDetails:
     """Accumulates card fields across turns until all are present."""
-    number: Optional[str]  = None   # 16-digit string, no spaces
+    number: Optional[str]  = None
     expiry_month: Optional[int]  = None
     expiry_year:  Optional[int]  = None
     cvv:           Optional[str]  = None

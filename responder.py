@@ -80,9 +80,12 @@ def _ask(instruction: str, fallback: str) -> str:
 
 def greet(history: Optional[List[Dict[str, str]]] = None) -> str:
     return _ask(
-        "Greet the user warmly and ask for their account ID to get started.",
-        "Hello! Welcome to payment services. Could you please share your 7-character account ID to get started?"
+        "Greet the user warmly and ask for their ACCXXXX Account ID to get started. "
+        "The Account ID always starts with the letters ACC followed by exactly 4 digits, for example ACCXXXX where X represent numbers. "
+        "Hello! Welcome to our payment services. Could you please share your Account ID to get started? "
+        "It starts with ACC followed by 4 digits — for example, ACCXXXX where X represent numbers.."
     )
+
 
 
 def ask_account_id(retry: bool = False, history: Optional[List[Dict[str, str]]] = None) -> str:
@@ -92,7 +95,7 @@ def ask_account_id(retry: bool = False, history: Optional[List[Dict[str, str]]] 
             "I couldn't find that account. Could you double-check your account ID? It should look like ACCXXXX."
         )
     return _ask(
-        "Politely ask the customer to share their Account ID to get started.",
+        "Politely ask the customer to share their Account ID, It should start with 'ACC' followed by numbers, format: like ACCXXXX.",
         "Could you please share your account ID? It should start with 'ACC' followed by digits, like ACCXXXX."
     )
 

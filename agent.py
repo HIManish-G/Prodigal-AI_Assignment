@@ -276,6 +276,10 @@ class Agent:
             missing = self.state.card.missing_fields()
             if missing:
                 self.state.stage = Stage.AWAIT_CARD
+                if "card number" in missing and extractor.has_failed_luhn_card_number(text):
+                    return responder.card_validation_error(
+                        "card number failed Luhn check (invalid card number)"
+                    )
                 return responder.ask_card_details(missing)
 
             validation_error = extractor.validate_card(self.state.card)

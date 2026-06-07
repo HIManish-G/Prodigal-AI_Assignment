@@ -151,16 +151,7 @@ class HealthResponse(BaseModel):
     status: str
     active_sessions: int
     payment_confirmation_required: bool
-
-@app.get("/health", response_model=HealthResponse)
-async def health() -> HealthResponse:
-    async with _sessions_lock:
-        active = len(_sessions)
-    return HealthResponse(
-        status="ok",
-        active_sessions=active,
-        payment_confirmation_required=get_require_confirmation()
-    )   
+ 
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -271,7 +262,10 @@ async def delete_session(session_id: str) -> None:
 
 @app.get("/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
-    """Health check."""
     async with _sessions_lock:
         active = len(_sessions)
-    return HealthResponse(status="ok", active_sessions=active)
+    return HealthResponse(
+        status="ok",
+        active_sessions=active,
+        payment_confirmation_required=get_require_confirmation()
+    )  
