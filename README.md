@@ -270,4 +270,21 @@ The FastAPI server wraps the agent in a session store with 30-minute TTL expiry,
 - Partial payments (amount less than balance) are supported
 - Account ID swaps are allowed before verification is complete — all state is cleared on swap
 - Amounts with more than 2 decimal places are rounded, not rejected
-- The FastAPI server uses in-memory session storage — for multi-process deployments a shared store such as Redis would be requireds
+- The FastAPI server uses in-memory session storage — for multi-process deployments a shared store such as Redis would be required
+
+---
+
+## Evaluation Results
+
+**[→ View interactive evaluation dashboard](https://himanish-g.github.io/Prodigal-AI_Assignment/Dashboard/payment_agent_eval_dashboard.html)**
+
+The dashboard covers LLM judge scores per test case, test duration by category, pass rate across all 18 tag categories, conversation turn counts, and average LLM HTTP calls per stage.
+
+Summary:
+
+| Suite | Passed | Total | Pass Rate |
+|---|---|---|---|
+| Standard test cases | 16 | 16 | 100% |
+| Adversarial test cases | 13 | 13 | 100% |
+| Tag categories | 18 | 18 | 100% |
+| LLM judge average | — | — | 8.0 / 10 |
